@@ -16,11 +16,11 @@ i = 1;
 while(1)
     
     d = sqrt((x_g-x(i))^2+(y_g-y(i))^2);
-    if( d < 0.1 || i > 10000)
+    if( d < 0.1 || i > 1000)
         break;
     end
     
-    theta_g = atan((y_g-y(i))/(x_g-x(i)));
+    theta_g = atan2(y_g-y(i),x_g-x(i));
 
     v = K_v * sqrt((x_g-x(i))^2+(y_g-y(i))^2);
     omega = K_h * (theta_g - theta(i));

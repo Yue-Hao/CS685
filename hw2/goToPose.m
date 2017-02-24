@@ -1,10 +1,16 @@
-function [x,y,theta] = goToPose(X_0, X_g)
+function [x,y,theta] = goToPose(X_0, X_g, K)
 
 k_rho = 3;
 k_alpha = 8;
 k_beta = -1.5;
-delta = 0.01;
 
+if nargin > 2
+k_rho = K(1);
+k_alpha = K(2);
+k_beta = K(3);
+end
+
+delta = 0.01;
 x = X_0(1);
 y = X_0(2);
 theta = X_0(3);
@@ -18,9 +24,19 @@ while(1)
     
     rho = sqrt((x_g-x(i))^2+(y_g-y(i))^2);
     
-    if( rho < 0.1 || i > 10000)
+    if( rho < 0.1 || i > 1000)
      	break;
     end
+    
+    while(theta(i) > pi)
+        theta(i) = theta(i)-2*pi;
+    end
+    
+    while(theta(i) < -pi)
+        theta(i) = theta(i)+2*pi;
+    end
+    
+    
     
     alpha = -theta(i) + atan2(y_g-y(i),(x_g-x(i)));
     beta = -theta(i) - alpha;

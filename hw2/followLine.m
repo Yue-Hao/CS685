@@ -15,15 +15,15 @@ c = l(3);
 i = 1;
 
 while(1)
-    
 
-    if(i > 10000)
+    if(i > 15000)
         break;
     end
     
+    
     d = [a b c]*[x(i) y(i) 1]'/sqrt(a^2+b^2);
     
-    theta_g = atan( -a / b);
+    theta_g = atan2(b,-a);
     
     alpha_d = -K_d * d;
     alpha_h = K_h*(theta_g-theta(i));
