@@ -23,82 +23,64 @@ for i = 1:map_to_integer([l_max, l_max, l_max, 3], l_max)
             next_state = map_to_state(j,l_max);
             
             s_diff = next_state(1:3) - current_state(1:3);
-            if max(s_diff) > 1 || min(s_diff) < -1
-                T{action}(i,j) = 0;
-                R{action}(i,j) = 0;
-                continue;
-            end
-            
-            if current_state(4) == next_state(4)
-                % no queue change
-
-                if current_state(4) == action
                     
-                    if current_state(action) > 0
-                        % a request is cleared
-                        r = 1;
-                    end
-                    
-                    s_diff(action) = s_diff(action) + 1;
-                    t = calc_t(s_diff,p);
-                    
-                    switch mat2str(s_diff)
-                            case '[0 0 0]'l
-                                t = (1-p(1))*(1-p(2))*(1-p(3));
-                            case '[1 0 0]'
-                                t = p(1)*(1-p(2))*(1-p(3));
-                            case '[0 1 0]'
-                                t = (1-p(1))*p(2)*(1-p(3));
-                            case '[1 1 0]'
-                                t = p(1)*p(2)*(1-p(3));
-                            case '[0 0 1]'
-                                t = (1-p(1))*(1-p(2))*p(3);
-                            case '[1 0 1]'
-                                t = p(1)*(1-p(2))*p(3);
-                            case '[0 1 1]'
-                                t = (1-p(1))*p(2)*p(3);
-                            case '[1 1 1]'
-                                t = p(1)*p(2)*p(3);
-                            otherwise
-                                t = 0;
-                        end
-                    
-                else
-                    t = 0; r = 0;
-                end
+            if current_state(4) == next_state(4) && current_state(action) > 0
+                 % a request is cleared
+                 r = 1;
             else
-                % queue changed
-                
-                r = 0; % not clearing a request
-                
-                if next_state(4) == action
+                 r = 0;
+            end
                     
-                        switch mat2str(s_diff)
-                            case '[0 0 0]'
-                                t = (1-p(1))*(1-p(2))*(1-p(3));
-                            case '[1 0 0]'
-                                t = p(1)*(1-p(2))*(1-p(3));
-                            case '[0 1 0]'
-                                t = (1-p(1))*p(2)*(1-p(3));
-                            case '[1 1 0]'
-                                t = p(1)*p(2)*(1-p(3));
-                            case '[0 0 1]'
-                                t = (1-p(1))*(1-p(2))*p(3);
-                            case '[1 0 1]'
-                                t = p(1)*(1-p(2))*p(3);
-                            case '[0 1 1]'
-                                t = (1-p(1))*p(2)*p(3);
-                            case '[1 1 1]'
-                                t = p(1)*p(2)*p(3);
-                            otherwise
-                                t = 0;
+            tt = [0 0 0];
+            for k = 1:3
+            	if s_diff(k) == -1
+                    if(k == action)
+                        % cleared and not added
+                        tt(k) = 1 - p(k);
+                    else
+                        % not possible
+                        tt(k) = 0;
+                    end
+                 elseif s_diff(k) == 0
+                    if(k == action)
+                        % no queue change
+                        if(current_state(k) == 0)
+                            % not cleared request and not added
+                            tt(k) = 1 - p(k);
+                        else
+                            % cleared and added
+                            tt(k) = p(k);
                         end
-    
-                else
-                    t = 0;
-                end
-                
-            end         
+                    else  
+                        % queue change
+                        if(current_state(k) == l_max)
+                            % queue full
+                            tt(k) = 1;
+                        else
+                            % not cleared and not added
+                            tt(k) = 1-p(k);
+                        end
+                    end
+                 elseif s_diff(k) == 1
+                    if(k == action)
+                        % no queue change
+                        if(current_state(k) == 0)
+                            % not clear and added
+                            tt(k) = p(k);
+                        else
+                            % not possible
+                            tt(k) = 0;
+                        end
+                    else
+                        % queue change
+                        tt(k) = p(k);
+                    end                            
+                 else
+                    % not possible
+                    tt(k) = 0;
+                 end
+            end
+            t = tt(1)*tt(2)*tt(3);
             
             T{action}(i,j) = t;
             R{action}(i,j) = r;
@@ -109,4 +91,5 @@ end
 queue_mdp.T = T;
 queue_mdp.R = R;
 queue_mdp.gamma = gamma;
+
 end
