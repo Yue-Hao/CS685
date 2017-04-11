@@ -1,0 +1,8 @@
+subplot(4,1,1)
+sift_match('query.JPG', 'db1.JPG')
+subplot(4,1,2)
+sift_match('query.JPG', 'db2.JPG')
+subplot(4,1,3)
+sift_match('query.JPG', 'db3.JPG')
+subplot(4,1,4)
+sift_match('query.JPG', 'db4.JPG')
